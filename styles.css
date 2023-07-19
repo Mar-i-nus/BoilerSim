@@ -149,3 +149,10 @@ body {
   margin-bottom: 10px;
   margin-right: 10px;
 }
+
+.spiraal {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-color: red;
+}

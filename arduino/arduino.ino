@@ -8,6 +8,7 @@
 #define TOGGLE_ntc6 16
 #define RELAY 7
 #define RELAY1 15
+#define spiraal 8
 
 void setup() {
   pinMode(ntc1, OUTPUT);
@@ -18,10 +19,23 @@ void setup() {
   pinMode(TOGGLE_ntc6, OUTPUT);
   pinMode(RELAY, OUTPUT);
   pinMode(RELAY1, OUTPUT);
+  pinMode(spiraal, INPUT);
   Serial.begin(9600);
 }
 
 void loop() {
+  int buttonState = digitalRead(spiraal);
+
+  if (buttonState == HIGH) { // als de knop is ingedrukt (laag als de knop is aangesloten op GND)
+    Serial.println("boiler staat aan");
+    delay(100); // stuur een bericht naar de seriële poort
+  } else if (buttonState == LOW) {
+    Serial.println("boiler staat uit");
+    delay(100);
+  }
+   // wacht een korte tijd om te voorkomen dat teveel berichten worden verstuurd
+
+
   if (Serial.available()) {
     String command = Serial.readStringUntil('\n');
     int separatorIndex = command.indexOf(':');

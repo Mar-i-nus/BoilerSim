@@ -31,6 +31,7 @@
     <div id="boiler-frame-afbeelding">
       <!-- Hier komt het boiler plaatje -->
       <img src="boiler.svg" alt="boiler">
+      <div id="spiraal" class="spiraal"></div>
   </div>
 
 
@@ -45,7 +46,7 @@
       </div>
     
       <div class="ntc-row">
-        <label for="NTC5_select">NTC5: <input type="range" id="ntc5" min="0" max="255" value="10" oninput="updateNTCAndSlider('5', this.value)" /> <span id="ntc5-value">0°C</span> </label>
+        <label for="NTC5_select">NTC5: <input type="range" id="ntc5" min="0" max="255" value="10" step="5" oninput="updateNTCAndSlider('5', this.value)" /> <span id="ntc5-value">0°C</span> </label>
         <select id="NTC5_select">
           <option value="Connected">Connected</option>
           <option value="Open Leads">Open Leads</option>
@@ -90,6 +91,11 @@
           <option value="Short Circuit">Short Circuit</option>
         </select>
       </div>
+      <select id="dropdownMenu">
+        <option value="auto">Automatisch</option>
+        <option value="handmatig">Handmatig</option>
+      </select>
+
     </div>
   
     <div id="error-frame">

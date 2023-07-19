@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<body id="body">
+
+<h1>Web Serial API Test</h1>
+<button id="connect">Connect</button>
+
+<script>
+  const connectButton = document.getElementById('connect');
+  const body = document.getElementById('body');
+  
+  async function onConnectClick() {
+    if (!navigator.serial) {
+      console.log('Web Serial API not supported.');
+      return;
+    }
+
+    const port = await navigator.serial.requestPort();
+
+    await port.open({ baudRate: 9600 });
+
+    readFromPort(port);
+  }
+  
+  async function readFromPort(port) {
+    const reader = port.readable.getReader();
+    const decoder = new TextDecoder('utf-8');
+
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) {
+        reader.releaseLock();
+        break;
+      }
+
+      const data = decoder.decode(value);
+
+      console.log(data);
+
+      if (data.includes('boiler staat aan')) {
+        body.style.backgroundColor = 'green';
+      } else if (data.includes('boiler staat uit')) {
+        body.style.backgroundColor = 'red';
+      }
+    }
+  }
+  
+  connectButton.addEventListener('click', onConnectClick);
+</script>
+
+</body>
+</html>

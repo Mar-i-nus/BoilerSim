@@ -2,7 +2,7 @@
 let port; // De seriële poort waarmee we communiceren
 let link34 = true; // Deze variabele bepaalt of de schuifjes NTC3 en NTC4 gesynchroniseerd worden
 let beginwaarde = 20; 
-
+let currentBoilerStatus = '';
 
 
 async function connect() {
@@ -21,9 +21,6 @@ async function connect() {
     // controleer of de verbinding succesvol is
     if (port && port.readable && port.writable) {
 
-
-        
-
         // verberg het startscherm en toon de bedieningselementen
         document.getElementById('startup-screen').style.display = 'none';
         document.getElementById('controls').style.display = 'flex';
@@ -33,11 +30,15 @@ async function connect() {
         
         // update connection status
         document.getElementById('connection-status').textContent = "Connected";
+        
+        log("seriel lezen gaat beginnen")
+        await readData();
 
         //update de sensoren als deze worden aangesloten. 
         for (let i = 1; i <= 5; i++) {
           await updateNTCAndSlider(i, 30);
       }
+      
 
     } else {
         // maak de kleur van de rand van het kader rood als de verbinding niet succesvol is
@@ -50,30 +51,116 @@ async function connect() {
 
 
 //functie om op te halen of boiler aanstaan of uit
-async function readData() {
-  const reader = port.readable.getReader();
 
-  while (true) {
-      const { value, done } = await reader.read();
-      if (done) {
-          reader.releaseLock();
-          break;
+async function connect() {
+  port = await navigator.serial.requestPort({});
+  await port.open({ baudRate: 9600 });
+
+  const connectBtn = document.getElementById("connect");
+  connectBtn.className = "connect-button connected";
+  connectBtn.textContent = "Disconnect";
+  connectBtn.onclick = disconnect;
+
+  if (port && port.readable && port.writable) {
+      document.getElementById('startup-screen').style.display = 'none';
+      document.getElementById('controls').style.display = 'flex';
+      document.getElementById('startup-screen').style.borderTopColor = 'green';
+      document.getElementById('connection-status').textContent = "Connected";
+
+      await readData(); 
+
+      for (let i = 1; i <= 5; i++) {
+        await updateNTCAndSlider(i, 30);
       }
-
-      // Converteer de ontvangen data naar een tekststring:
-      let decoder = new TextDecoder('utf-8');
-      let data = decoder.decode(value);
-
-      // Als de ontvangen data aangeeft dat de knop is ingedrukt, verander de kleur van het lampje:
-      if (data.includes("boiler staat aan")) {
-          document.getElementById('spiraal').style.backgroundColor = 'green';
-      }
+  } else {
+      document.getElementById('startup-screen').style.borderTopColor = 'red';
+      document.getElementById('connection-status').textContent = "Not Connected";
   }
 }
 
-  
-  
+////////////////////////////////simuleren dat boiler opwarmt///////////////////////////////////////////
+let runSimulation = false;
 
+async function readData() {
+let reader = port.readable.getReader();
+let decoder = new TextDecoder('utf-8');
+
+while (true) {
+  let { value, done } = await reader.read();
+  if (done) {
+      reader.releaseLock();
+      break;
+  }
+
+  let data = decoder.decode(value);
+  let spiraal = document.getElementById('spiraal');
+
+  if (data.includes('boiler staat aan') && currentBoilerStatus != 'aan') {
+    spiraal.style.backgroundColor = 'green';
+    currentBoilerStatus = 'aan';
+    log('boiler staat aan');
+    runSimulation = true;
+    startHeatUpSimulatie()
+  } else if (data.includes('boiler staat uit') && currentBoilerStatus != 'uit') {
+    spiraal.style.backgroundColor = 'red';
+    currentBoilerStatus = 'uit';
+    runSimulation = false;
+    log('boiler staat uit');
+  }
+
+  await new Promise(resolve => setTimeout(resolve, 1000));
+}
+}
+
+//hier kijk ik of hij op automatisch staat of niet
+async function startHeatUpSimulatie() {
+  // Verkrijg de huidige waarde van het dropdown-menu
+  let dropdownWaarde = document.getElementById('dropdownMenu').value;
+
+  // Als de waarde 'auto' is, start dan de simulatie
+  if (dropdownWaarde == 'auto') {
+    await simulateHeatup();
+  } else {
+    // Anders, geef een bericht dat de simulatie niet zal starten
+    log('Simulatie zal niet starten omdat het dropdown-menu op Handmatig is ingesteld');
+  }
+}
+
+//hiermee laat ik de boiler fictief opwarmen als het helemet is ingeschakeld
+async function simulateHeatup() {
+  log('Water is heating up...');
+  
+  // Lus totdat simulatie wordt stopgezet
+  while (runSimulation) {
+    // Lus door elke sensor
+    for (let i = 1; i <= 6; i++) {
+      // Verlaat de lus als de simulatie is stopgezet
+      if (!runSimulation) {
+        break;
+      }
+
+      // Haal de huidige waarde van de sensor op
+      let currentValue = Number(document.getElementById('ntc' + i).value);
+      
+      // Bereken de nieuwe waarde, maar zorg ervoor dat deze niet hoger is dan 255
+      let newValue = Math.min(currentValue + 5, 255);
+
+      document.getElementById('ntc' + i).value = newValue;
+      //log('Setting ntc ' + i + ' to ' + newValue / 2.55 + ' °C');  // Aangenomen dat 255 overeenkomt met 100°C
+      await updatentc(i.toString(), newValue);
+
+      // Wacht 100ms voordat je naar de volgende sensor gaat
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    
+    // Verlaat de lus als de waarde van elke sensor 255 is
+    if (Array.from({length: 6}, (_, i) => Number(document.getElementById('ntc' + (i + 1)).value)).every(value => value === 255)) {
+      break;
+    }
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
   
 // Functie om de verbinding met de poort te verbreken
   async function disconnect() {
@@ -303,6 +390,7 @@ window.onload = function() {
 
   log(`Welkom bij de Boile`);
   log(`BoilerSim is verbonden`);
+
 }
 
 
@@ -462,6 +550,8 @@ async function simulateError() {
     
 }
 
+
+
   
   function log(message) {
     const timestamp = new Date();
@@ -527,3 +617,19 @@ async function simulateError() {
   }
   
    
+  async function simulateOverheat() {
+    log('Simulating error: Overheat protection');
+    
+    // Lus door elke sensor
+    for (let i = 1; i <= 6; i++) {
+      // Lus door elke waarde van 0 tot 255
+      for (let value = 0; value <= 255; value++) {
+        document.getElementById('ntc' + i).value = value;
+        log('Setting ntc ' + i + ' to ' + value / 2.55 + ' °C');  // Aangenomen dat 255 overeenkomt met 100°C
+        await updatentc(i.toString(), value);
+  
+        // Wacht 100ms voordat je naar de volgende waarde gaat
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+    }
+  }
