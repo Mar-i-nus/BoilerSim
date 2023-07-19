@@ -21,6 +21,9 @@ async function connect() {
     // controleer of de verbinding succesvol is
     if (port && port.readable && port.writable) {
 
+
+        
+
         // verberg het startscherm en toon de bedieningselementen
         document.getElementById('startup-screen').style.display = 'none';
         document.getElementById('controls').style.display = 'flex';
@@ -45,6 +48,28 @@ async function connect() {
     }
 }
 
+
+//functie om op te halen of boiler aanstaan of uit
+async function readData() {
+  const reader = port.readable.getReader();
+
+  while (true) {
+      const { value, done } = await reader.read();
+      if (done) {
+          reader.releaseLock();
+          break;
+      }
+
+      // Converteer de ontvangen data naar een tekststring:
+      let decoder = new TextDecoder('utf-8');
+      let data = decoder.decode(value);
+
+      // Als de ontvangen data aangeeft dat de knop is ingedrukt, verander de kleur van het lampje:
+      if (data.includes("boiler staat aan")) {
+          document.getElementById('spiraal').style.backgroundColor = 'green';
+      }
+  }
+}
 
   
   
@@ -414,6 +439,21 @@ async function simulateError() {
               document.getElementById('ntc6').value = 255;
               log('Setting ntc 6 to 100 °C');
               await updatentc('6', 255);
+
+              log('Done');
+              break;
+
+            case 'E11':
+              log('Simulating error: ' + selectedError);
+              log('Delta between the duplex sensor is too large');
+              
+              document.getElementById('ntc3').value = 153;
+              log('Setting ntc 3 to 60 °C');
+              await updatentc('3', 153);
+
+              document.getElementById('ntc4').value = 71;
+              log('Setting ntc 4 to 30 °C');
+              await updatentc('4', 71);
 
               log('Done');
               break;
