@@ -67,6 +67,27 @@ body {
     
   }
 
+  #boiler-frame-afbeelding {
+    width: 500px;  /* Verander de breedte naar wens */
+    margin: 100px auto;  /* Centreer het element */
+    padding: 25px;  /* Voeg ruimte toe rondom de tekst */
+    margin-right: 20px;
+    border: 1px solid rgba(0, 0, 0, 0.2);  /* Voeg een lichtere, meer doorzichtige rand toe */
+    border-radius: 5px;  /* Ronde hoeken */
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1);  /* Schaduw */
+    background-color: #fff;  /* Achtergrondkleur */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+  }
+
+  #boiler-frame-afbeelding img {
+    width: 200px;  /* Vergroot de breedte */
+    height: auto;  /* behoud de beeldverhouding */
+  }
+  
+
 #startup-screen {
     width: 500px;  /* Verander de breedte naar wens */
     margin: 100px auto;  /* Centreer het element */

@@ -7,6 +7,7 @@
 #define ntc5 10
 #define TOGGLE_ntc6 16
 #define RELAY 7
+#define RELAY1 15
 
 void setup() {
   pinMode(ntc1, OUTPUT);
@@ -16,6 +17,7 @@ void setup() {
   pinMode(ntc5, OUTPUT);
   pinMode(TOGGLE_ntc6, OUTPUT);
   pinMode(RELAY, OUTPUT);
+  pinMode(RELAY1, OUTPUT);
   Serial.begin(9600);
 }
 
@@ -51,6 +53,13 @@ void loop() {
         digitalWrite(RELAY, HIGH);
       } else {
         digitalWrite(RELAY, LOW);
+      }
+    }
+    else if (key == "NTC1_select") {
+      if (value == "Open Leads") {
+        digitalWrite(RELAY1, HIGH);
+      } else {
+        digitalWrite(RELAY1, LOW);
       }
     }
   }

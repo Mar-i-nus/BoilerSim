@@ -3,6 +3,8 @@ let port; // De seriële poort waarmee we communiceren
 let link34 = true; // Deze variabele bepaalt of de schuifjes NTC3 en NTC4 gesynchroniseerd worden
 let beginwaarde = 20; 
 
+
+
 async function connect() {
     // vraag de gebruiker om een seriepoort te selecteren
     port = await navigator.serial.requestPort({});
@@ -88,6 +90,124 @@ async function connect() {
 }
 
 
+// Functie om de geselecteerde waarde van NTC1_select naar de Arduino te sturen
+async function updateNTC1(value) {
+  if (!port) {
+    console.log('Port is not connected');
+    return;
+  }
+
+  // Verzend de gegevens naar de seriële poort
+  const writer = port.writable.getWriter();
+  const data = `NTC1_select:${value}\n`;
+  await writer.write(new TextEncoder().encode(data));
+  writer.releaseLock();
+}
+
+// Voeg een event listener toe aan het dropdown-menu
+// Dit zal de geselecteerde waarde naar de Arduino sturen wanneer deze verandert
+document.getElementById("NTC1_select").onchange = function() { 
+  updateNTC1(this.value); 
+};
+
+async function updateNTC2(value) {
+  if (!port) {
+    console.log('Port is not connected');
+    return;
+  }
+
+  // Verzend de gegevens naar de seriële poort
+  const writer = port.writable.getWriter();
+  const data = `NTC2_select:${value}\n`;
+  await writer.write(new TextEncoder().encode(data));
+  writer.releaseLock();
+}
+
+// Voeg een event listener toe aan het dropdown-menu
+// Dit zal de geselecteerde waarde naar de Arduino sturen wanneer deze verandert
+document.getElementById("NTC2_select").onchange = function() { 
+  updateNTC2(this.value); 
+};
+
+
+async function updateNTC3(value) {
+  if (!port) {
+    console.log('Port is not connected');
+    return;
+  }
+
+  // Verzend de gegevens naar de seriële poort
+  const writer = port.writable.getWriter();
+  const data = `NTC3_select:${value}\n`;
+  await writer.write(new TextEncoder().encode(data));
+  writer.releaseLock();
+}
+
+// Voeg een event listener toe aan het dropdown-menu
+// Dit zal de geselecteerde waarde naar de Arduino sturen wanneer deze verandert
+document.getElementById("NTC3_select").onchange = function() { 
+  updateNTC3(this.value); 
+};
+
+async function updateNTC4(value) {
+  if (!port) {
+    console.log('Port is not connected');
+    return;
+  }
+
+  // Verzend de gegevens naar de seriële poort
+  const writer = port.writable.getWriter();
+  const data = `NTC4_select:${value}\n`;
+  await writer.write(new TextEncoder().encode(data));
+  writer.releaseLock();
+}
+
+// Voeg een event listener toe aan het dropdown-menu
+// Dit zal de geselecteerde waarde naar de Arduino sturen wanneer deze verandert
+document.getElementById("NTC4_select").onchange = function() { 
+  updateNTC4(this.value); 
+};
+
+async function updateNTC5(value) {
+  if (!port) {
+    console.log('Port is not connected');
+    return;
+  }
+
+  // Verzend de gegevens naar de seriële poort
+  const writer = port.writable.getWriter();
+  const data = `NTC5_select:${value}\n`;
+  await writer.write(new TextEncoder().encode(data));
+  writer.releaseLock();
+}
+
+// Voeg een event listener toe aan het dropdown-menu
+// Dit zal de geselecteerde waarde naar de Arduino sturen wanneer deze verandert
+document.getElementById("NTC5_select").onchange = function() { 
+  updateNTC5(this.value); 
+};
+
+async function updateNTC6(value) {
+  if (!port) {
+    console.log('Port is not connected');
+    return;
+  }
+
+  // Verzend de gegevens naar de seriële poort
+  const writer = port.writable.getWriter();
+  const data = `NTC6_select:${value}\n`;
+  await writer.write(new TextEncoder().encode(data));
+  writer.releaseLock();
+}
+
+// Voeg een event listener toe aan het dropdown-menu
+// Dit zal de geselecteerde waarde naar de Arduino sturen wanneer deze verandert
+document.getElementById("NTC6_select").onchange = function() { 
+  updateNTC6(this.value); 
+};
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 async function updateNTCAndSlider(ntc, value, propagate=true) {
   // Update de waarde van de slider
@@ -155,7 +275,7 @@ window.onload = function() {
   document.getElementById("ntc4-value").textContent = "12°C";
   document.getElementById("ntc5-value").textContent = "12°C";
   document.getElementById("ntc6-value").textContent = "12°C";
-  
+
   log(`Welkom bij de Boile`);
   log(`BoilerSim is verbonden`);
 }
@@ -255,6 +375,49 @@ async function simulateError() {
             }, 3000);
 
             break;
+
+            case 'W00':
+              log('Simulating error: ' + selectedError);
+              log('Legionella sensor error');
+              let ntc1Select = document.getElementById('NTC1_select');
+              ntc1Select.value = "Open Leads"; // U moet ervoor zorgen dat "Open Leads" een optie is in uw dropdown-menu
+              log('Setting NTC1 to Open Leads');
+              // Zorg ervoor dat u uw hardware correct configureert wanneer NTC1 is ingesteld op "Open Leads"
+              updateNTC1(ntc1Select.value);
+              log('Done');
+              break;
+
+            case 'E10':
+              log('Simulating error: ' + selectedError);
+              log('Overheat protection');
+              
+              document.getElementById('ntc1').value = 255;
+              log('Setting ntc 1 to 100 °C');
+              await updatentc('1', 255);
+
+              document.getElementById('ntc2').value = 255;
+              log('Setting ntc 2 to 100 °C');
+              await updatentc('2', 255);
+
+              document.getElementById('ntc3').value = 255;
+              log('Setting ntc 3 to 100 °C');
+              await updatentc('3', 255);
+
+              document.getElementById('ntc4').value = 255;
+              log('Setting ntc 4 to 100 °C');
+              await updatentc('4', 255);
+
+              document.getElementById('ntc5').value = 255;
+              log('Setting ntc 5 to 100 °C');
+              await updatentc('5', 255);
+
+              document.getElementById('ntc6').value = 255;
+              log('Setting ntc 6 to 100 °C');
+              await updatentc('6', 255);
+
+              log('Done');
+              break;
+
     }
     
 }
@@ -269,5 +432,58 @@ async function simulateError() {
   }
   
 
+  document.getElementById('resetButton').addEventListener('click', resetValues);
 
+  async function resetValues() {
+    log('All settings reset');
+    document.getElementById("ntc1-value").textContent = "12°C";
+    document.getElementById("ntc1").value = 30;
+    document.getElementById("ntc1").oninput = function() { updateNTCAndSlider('1', this.value); };
+    await updatentc('1', 30);
+    document.getElementById("ntc2-value").textContent = "12°C";
+    document.getElementById("ntc2").value = 30;
+    document.getElementById("ntc2").oninput = function() { updateNTCAndSlider('2', this.value); };
+    await updatentc('2', 30);
+    document.getElementById("ntc3-value").textContent = "12°C";
+    document.getElementById("ntc3").value = 30;
+    document.getElementById("ntc3").oninput = function() { updateNTCAndSlider('3', this.value); };
+    await updatentc('3', 30);
+    document.getElementById("ntc4-value").textContent = "12°C";
+    document.getElementById("ntc4").value = 30;
+    document.getElementById("ntc4").oninput = function() { updateNTCAndSlider('4', this.value); };
+    await updatentc('4', 30);
+    document.getElementById("ntc5-value").textContent = "12°C";
+    document.getElementById("ntc5").value = 30;
+    document.getElementById("ntc5").oninput = function() { updateNTCAndSlider('5', this.value); };
+    await updatentc('5', 30);
+    document.getElementById("ntc6-value").textContent = "12°C";
+    document.getElementById("ntc6").value = 30;
+    document.getElementById("ntc6").oninput = function() { updateNTCAndSlider('6', this.value); };
+    await updatentc('6', 30);
+
+    let ntc1Select = document.getElementById('NTC1_select');
+    ntc1Select.value = "Connected";
+    updateNTC1(ntc1Select.value);
+
+    let ntc2Select = document.getElementById('NTC2_select');
+    ntc2Select.value = "Connected";
+    updateNTC2(ntc2Select.value);
+
+    let ntc3Select = document.getElementById('NTC3_select');
+    ntc3Select.value = "Connected";
+    updateNTC3(ntc3Select.value);
+
+    let ntc4Select = document.getElementById('NTC4_select');
+    ntc4Select.value = "Connected";
+    updateNTC4(ntc4Select.value);
+
+    let ntc5Select = document.getElementById('NTC5_select');
+    ntc5Select.value = "Connected";
+    updateNTC5(ntc5Select.value);
+
+    let ntc6Select = document.getElementById('NTC6_select');
+    ntc6Select.value = "Connected";
+    updateNTC6(ntc6Select.value);
+  }
+  
    

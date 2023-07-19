@@ -27,6 +27,13 @@
 
 
   <div id="controls">
+
+    <div id="boiler-frame-afbeelding">
+      <!-- Hier komt het boiler plaatje -->
+      <img src="boiler.svg" alt="boiler">
+  </div>
+
+
     <div id="boiler-frame">
       <div class="ntc-row">
         <label for="NTC6_select">NTC6: <input type="range" id="ntc6" min="0" max="255" value="10" oninput="updateNTCAndSlider('6', this.value)" /> <span id="ntc6-value">0°C</span> </label>
@@ -90,14 +97,17 @@
       <p>
         <label for="errorSelect">Select error to simulate: </label>
         <select id="errorSelect">
-          <option value="test">Test</option>
-          <option value="test 2">Test 2</option>
+          <option value="W00">W00</option>
+          <option value="E10">E10</option>
           <option value="test 3">Test 3</option>
         </select>
         <button id="simulateError" onclick="simulateError()">Simulate Error</button>
+        <button id="resetButton">Reset Button</button>
       </p>
       <textarea id="log" readonly style="width: 100%; height: 300px;"></textarea>
     </div>
+
+
   </div>
   
 
