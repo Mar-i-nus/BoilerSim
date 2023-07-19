@@ -1,0 +1,104 @@
+/* Add some padding to the body */
+body {
+    padding: 20px;
+  }
+  
+  /* Create a header and display it as flex */
+  header {
+    display: flex;
+    align-items: center; /* Align items vertically in the center */
+    margin-bottom: 20px; /* Add some margin to the bottom of the header */
+  }
+  
+  /* Create some margin to the right of the logo */
+  .logo {
+    margin-right: 20px;
+  }
+  .connect-button {
+    padding: 10px 20px;
+    color: rgb(255, 255, 255);
+    border-radius: 3px;
+    background-color: transparent;  /* Maak de achtergrond transparant */
+    border: none;  /* Verwijder de rand */
+}
+
+  .disconnected {
+    background-color: rgb(235, 131, 3);
+  }
+
+  .connected {
+    background-color: green;
+  }
+
+
+
+
+
+  #logo {
+    position: absolute;
+    top: 5;
+    left: 5;
+    width: 200px;  
+    height: auto;  
+  }
+
+  #boiler-frame {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 4px solid black; /* Maak de rand dikker */
+    border-radius: 10px;
+    padding: 20px;
+    margin: 100px auto;
+    width: 30%;
+    background-color: rgb(239, 235, 235); /* Maak de achtergrond lichtgrijs */
+}
+
+#startup-screen {
+    width: 500px;  /* Verander de breedte naar wens */
+    margin: 100px auto;  /* Centreer het element */
+    padding: 25px;  /* Voeg ruimte toe rondom de tekst */
+    border: 1px solid rgba(0, 0, 0, 0.2);  /* Voeg een lichtere, meer doorzichtige rand toe */
+    border-radius: 5px;  /* Ronde hoeken */
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1);  /* Schaduw */
+    background-color: #fff;  /* Achtergrondkleur */
+    border-top: 5px solid rgb(235, 131, 3);
+}
+
+  
+  
+  #controls {
+    display: none;
+  }
+  
+  #connection-status {
+    text-align: right;
+    color: rgb(235, 131, 3); 
+    position: relative;
+    top: -20px; 
+    font-weight: bold; 
+    font-family: Arial, sans-serif; /* Pas dit aan naar het gewenste lettertype */
+}
+
+#startup-screen h2 {
+    color: #424242; /* Verander de tekstkleur naar rood */
+    font-size: 30px; /* Verhoog de tekstgrootte */
+    text-align: left; /* Centreer de tekst */
+    margin-top: -15px; /* Voeg wat ruimte toe aan de bovenkant */
+    font-weight: bold; 
+    font-family: Arial, sans-serif;
+  }
+
+#startup-screen p {
+    color: #0a0a0a; /* Verander de tekstkleur naar blauw */
+    font-size: 20px; /* Verhoog de tekstgrootte */
+    text-align: left; /* Justeer de tekst */
+    margin-bottom: 50px; /* Voeg wat ruimte toe aan de onderkant */
+    font-family: Arial, sans-serif;
+}
+
+#separator {
+    border: none;  /* Verwijdert de standaardrand */
+    border-top: 1px solid rgba(0, 0, 0, 0.2);  /* Voegt een bovenrand toe */
+    margin: 15px 0;  /* Voegt ruimte boven en onder de lijn toe */
+  }
