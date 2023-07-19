@@ -1,20 +1,20 @@
 #include <Arduino.h>
 
-#define LED1 9
-#define LED2 6
-#define LED3 5
-#define LED4 3
-#define LED5 10
-#define TOGGLE_LED6 16
+#define ntc1 9
+#define ntc2 6
+#define ntc3 5
+#define ntc4 3
+#define ntc5 10
+#define TOGGLE_ntc6 16
 #define RELAY 7
 
 void setup() {
-  pinMode(LED1, OUTPUT);
-  pinMode(LED2, OUTPUT);
-  pinMode(LED3, OUTPUT);
-  pinMode(LED4, OUTPUT);
-  pinMode(LED5, OUTPUT);
-  pinMode(TOGGLE_LED6, OUTPUT);
+  pinMode(ntc1, OUTPUT);
+  pinMode(ntc2, OUTPUT);
+  pinMode(ntc3, OUTPUT);
+  pinMode(ntc4, OUTPUT);
+  pinMode(ntc5, OUTPUT);
+  pinMode(TOGGLE_ntc6, OUTPUT);
   pinMode(RELAY, OUTPUT);
   Serial.begin(9600);
 }
@@ -26,24 +26,24 @@ void loop() {
     String key = command.substring(0, separatorIndex);
     String value = command.substring(separatorIndex + 1);
 
-    if (key.startsWith("LED")) {
-      int ledNumber = key.charAt(3) - '0';
-      int ledValue = map(value.toInt(), 0, 255, 0, 100);
-      switch(ledNumber) {
+    if (key.startsWith("ntc")) {
+      int ntcNumber = key.charAt(3) - '0';
+      int ntcValue = map(value.toInt(), 0, 255, 0, 100);
+      switch(ntcNumber) {
         case 1:
-          analogWrite(LED1, ledValue);
+          analogWrite(ntc1, ntcValue);
           break;
         case 2:
-          analogWrite(LED2, ledValue);
+          analogWrite(ntc2, ntcValue);
           break;
         case 3:
-          analogWrite(LED3, ledValue);
+          analogWrite(ntc3, ntcValue);
           break;
         case 4:
-          analogWrite(LED4, ledValue);
+          analogWrite(ntc4, ntcValue);
           break;
         case 5:
-          analogWrite(LED5, ledValue);
+          analogWrite(ntc5, ntcValue);
           break;
       }
     } else if (key == "TOGGLERELAY") {

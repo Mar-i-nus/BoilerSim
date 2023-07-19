@@ -13,7 +13,7 @@
 
   <div id="startup-screen">
     <div id="connection-status">NIET VERBONDEN</div>
-    <h2>BoilerSim</h2>
+    <h2>BoilerSim V0.1</h2>
     <p>Met deze simulator kunt u de functionaliteit van uw boiler temperatuurregelingssysteem nabootsen.</p>
     <hr id="separator" />
     <button id="connect" class="connect-button disconnected" onclick="connect()">Verbinding maken</button>
@@ -27,27 +27,79 @@
 
 
   <div id="controls">
-  <div id="boiler-frame">
-  <p>LED 1: <input type="range" id="led1" min="0" max="255" value="10" oninput="updateLedAndSlider('1', this.value)" /> <span id="led1-value">0°C</span></p>
-  <p>Relays2<input type="checkbox" id="relay-toggle" onchange="toggleRelay(this.checked)"/></p>
-  <p>LED 2: <input type="range" id="led2" min="0" max="255" value="10" oninput="updateLedAndSlider('2', this.value)" /> <span id="led2-value">0°C</span></p>
-  <p>LED 3: <input type="range" id="led3" min="0" max="255" value="10" oninput="updateLedAndSlider('3', this.value)" /> <span id="led3-value">0°C</span></p>
-  <p>Koppel LED 3 en 4: <input type="checkbox" id="link34" checked /></p>
-  <p>LED 4: <input type="range" id="led4" min="0" max="255" value="10" oninput="updateLedAndSlider('4', this.value)" /> <span id="led4-value">0°C</span></p>
-  <p>LED 5: <input type="range" id="led5" min="0" max="255" value="10" oninput="updateLedAndSlider('5', this.value)" /> <span id="led5-value">0°C</span></p>
+    <div id="boiler-frame">
+      <div class="ntc-row">
+        <label for="NTC6_select">NTC6: <input type="range" id="ntc6" min="0" max="255" value="10" oninput="updateNTCAndSlider('6', this.value)" /> <span id="ntc6-value">0°C</span> </label>
+        <select id="NTC6_select">
+          <option value="Connected">Connected</option>
+          <option value="Open Leads">Open Leads</option>
+          <option value="Short Circuit">Short Circuit</option>
+        </select>
+      </div>
+    
+      <div class="ntc-row">
+        <label for="NTC5_select">NTC5: <input type="range" id="ntc5" min="0" max="255" value="10" oninput="updateNTCAndSlider('5', this.value)" /> <span id="ntc5-value">0°C</span> </label>
+        <select id="NTC5_select">
+          <option value="Connected">Connected</option>
+          <option value="Open Leads">Open Leads</option>
+          <option value="Short Circuit">Short Circuit</option>
+        </select>
+      </div>
+    
+      <div class="ntc-row">
+        <label for="NTC4_select">NTC4: <input type="range" id="ntc4" min="0" max="255" value="10" oninput="updateNTCAndSlider('4', this.value)" /> <span id="ntc4-value">0°C</span> </label>
+        <select id="NTC4_select">
+          <option value="Connected">Connected</option>
+          <option value="Open Leads">Open Leads</option>
+          <option value="Short Circuit">Short Circuit</option>
+        </select>
+      </div>
+    
+      <p>Koppel NTC 3 en 4: <input type="checkbox" id="link34" checked /></p>
+
+      <div class="ntc-row">
+        <label for="NTC3_select">NTC3: <input type="range" id="ntc3" min="0" max="255" value="10" oninput="updateNTCAndSlider('3', this.value)" /> <span id="ntc3-value">0°C</span> </label>
+        <select id="NTC3_select">
+          <option value="Connected">Connected</option>
+          <option value="Open Leads">Open Leads</option>
+          <option value="Short Circuit">Short Circuit</option>
+        </select>
+      </div>
+    
+      <div class="ntc-row">
+        <label for="NTC2_select">NTC2: <input type="range" id="ntc2" min="0" max="255" value="10" oninput="updateNTCAndSlider('2', this.value)" /> <span id="ntc2-value">0°C</span> </label>
+        <select id="NTC2_select">
+          <option value="Connected">Connected</option>
+          <option value="Open Leads">Open Leads</option>
+          <option value="Short Circuit">Short Circuit</option>
+        </select>
+      </div>
+    
+      <div class="ntc-row">
+        <label for="NTC1_select">NTC1: <input type="range" id="ntc1" min="0" max="255" value="10" oninput="updateNTCAndSlider('1', this.value)" /> <span id="ntc1-value">0°C</span> </label>
+        <select id="NTC1_select">
+          <option value="Connected">Connected</option>
+          <option value="Open Leads">Open Leads</option>
+          <option value="Short Circuit">Short Circuit</option>
+        </select>
+      </div>
     </div>
-  <h2>Error Simulation</h2>
-  <p>
-    <label for="errorSelect">Select error to simulate: </label>
-    <select id="errorSelect">
-      <option value="test">Test</option>
-      <option value="test 2">Test 2</option>
-      <option value="test 3">Test 3</option>
-    </select>
-    <button id="simulateError" onclick="simulateError()">Simulate Error</button>
-  </p>
-  <textarea id="log" readonly style="width: 100%; height: 300px;"></textarea>
-</div>
+  
+    <div id="error-frame">
+      <h2>Error Simulation</h2>
+      <p>
+        <label for="errorSelect">Select error to simulate: </label>
+        <select id="errorSelect">
+          <option value="test">Test</option>
+          <option value="test 2">Test 2</option>
+          <option value="test 3">Test 3</option>
+        </select>
+        <button id="simulateError" onclick="simulateError()">Simulate Error</button>
+      </p>
+      <textarea id="log" readonly style="width: 100%; height: 300px;"></textarea>
+    </div>
+  </div>
+  
 
   <script src="main.js"></script>
 </body>
