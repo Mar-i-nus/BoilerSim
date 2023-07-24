@@ -1,52 +1,32 @@
 <!DOCTYPE html>
 <html>
-<body id="body">
+<body>
+    <p>Sensor 1:</p>
+    <input type="range" min="92" max="128" value="92" class="slider" id="myRange1">
+    <p>Temperatuur: <span id="temperature1"></span></p>
 
-<h1>Web Serial API Test</h1>
-<button id="connect">Connect</button>
+    <p>Sensor 2:</p>
+    <input type="range" min="92" max="128" value="92" class="slider" id="myRange2">
+    <p>Temperatuur: <span id="temperature2"></span></p>
 
-<script>
-  const connectButton = document.getElementById('connect');
-  const body = document.getElementById('body');
-  
-  async function onConnectClick() {
-    if (!navigator.serial) {
-      console.log('Web Serial API not supported.');
-      return;
-    }
+    <p>Sensor 3:</p>
+    <input type="range" min="92" max="128" value="92" class="slider" id="myRange3">
+    <p>Temperatuur: <span id="temperature3"></span></p>
 
-    const port = await navigator.serial.requestPort();
+    <p>Sensor 4:</p>
+    <input type="range" min="92" max="128" value="92" class="slider" id="myRange4">
+    <p>Temperatuur: <span id="temperature4"></span></p>
 
-    await port.open({ baudRate: 9600 });
+    <p>Sensor 5:</p>
+    <input type="range" min="92" max="128" value="92" class="slider" id="myRange5">
+    <p>Temperatuur: <span id="temperature5"></span></p>
 
-    readFromPort(port);
-  }
-  
-  async function readFromPort(port) {
-    const reader = port.readable.getReader();
-    const decoder = new TextDecoder('utf-8');
+    <p>Sensor 6:</p>
+    <input type="range" min="92" max="128" value="92" class="slider" id="myRange6">
+    <p>Temperatuur: <span id="temperature6"></span></p>
 
-    while (true) {
-      const { value, done } = await reader.read();
-      if (done) {
-        reader.releaseLock();
-        break;
-      }
+    <button id="connectButton">Verbinden</button>
 
-      const data = decoder.decode(value);
-
-      console.log(data);
-
-      if (data.includes('boiler staat aan')) {
-        body.style.backgroundColor = 'green';
-      } else if (data.includes('boiler staat uit')) {
-        body.style.backgroundColor = 'red';
-      }
-    }
-  }
-  
-  connectButton.addEventListener('click', onConnectClick);
-</script>
-
+    <script src="script.js"></script>
 </body>
 </html>

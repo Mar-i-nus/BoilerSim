@@ -4,6 +4,51 @@ let link34 = true; // Deze variabele bepaalt of de schuifjes NTC3 en NTC4 gesync
 let beginwaarde = 20; 
 let currentBoilerStatus = '';
 
+//mappen van de slider: 
+
+let sliderTemperatureMap = {
+  92: 21,
+  93: 21.4,
+  94: 21.9,
+  95: 22.8,
+  96: 23.2,
+  97: 23.6,
+  98: 24.5,
+  99: 25.3,
+  100: 26,
+  101: 26.1,
+  102: 27,
+  103: 28,
+  104: 29,
+  105: 30,
+  106: 30.9,
+  107: 32,
+  108: 33.4,
+  109: 34.2,
+  110: 35.5,
+  111: 37,
+  112: 39,
+  113: 40,
+  114: 41.7,
+  115: 43.5,
+  116: 46.4,
+  117: 48,
+  118: 50,
+  119: 52.3,
+  120: 56.8,
+  121: 59.8,
+  122: 63.3,
+  123: 67.8,
+  124: 75.3,
+  125: 82.1,
+  126: 92,
+  127: 108,
+  128: 144
+};
+
+function sliderToTemperature(sliderValue) {
+  return sliderTemperatureMap[sliderValue];
+}
 
 async function connect() {
     // vraag de gebruiker om een seriepoort te selecteren
@@ -194,11 +239,13 @@ async function simulateHeatup() {
   const writer = port.writable.getWriter();
   const data = `ntc${ntc}:${value}\n`;
   await writer.write(new TextEncoder().encode(data));
+  //log(data);
   writer.releaseLock();
 
 // Update de temperatuurwaarde op de gebruikersinterface
   const ntcValue = document.getElementById(`ntc${ntc}-value`);
-  ntcValue.textContent = Math.round((value / 255) * 100) + "°C";
+  ntcValue.textContent = sliderToTemperature(value) + "°C";
+  //log(ntcValue.textContent);
 }
 
 
@@ -374,19 +421,19 @@ document.getElementById("ntc6").oninput = function() { updateNTCAndSlider('6', t
 
 // Set the initial slider value to 30
 window.onload = function() {
-  document.getElementById("ntc1").value = 30;
-  document.getElementById("ntc2").value = 30;
-  document.getElementById("ntc3").value = 30;
-  document.getElementById("ntc4").value = 30;
-  document.getElementById("ntc5").value = 30;
-  document.getElementById("ntc6").value = 30;
+  document.getElementById("ntc1").value = 92;
+  document.getElementById("ntc2").value = 92;
+  document.getElementById("ntc3").value = 92;
+  document.getElementById("ntc4").value = 92;
+  document.getElementById("ntc5").value = 92;
+  document.getElementById("ntc6").value = 92;
 
-  document.getElementById("ntc1-value").textContent = "12°C";
-  document.getElementById("ntc2-value").textContent = "12°C";
-  document.getElementById("ntc3-value").textContent = "12°C";
-  document.getElementById("ntc4-value").textContent = "12°C";
-  document.getElementById("ntc5-value").textContent = "12°C";
-  document.getElementById("ntc6-value").textContent = "12°C";
+  document.getElementById("ntc1-value").textContent = "20°C";
+  document.getElementById("ntc2-value").textContent = "20°C";
+  document.getElementById("ntc3-value").textContent = "20°C";
+  document.getElementById("ntc4-value").textContent = "20°C";
+  document.getElementById("ntc5-value").textContent = "20°C";
+  document.getElementById("ntc6-value").textContent = "20°C";
 
   log(`Welkom bij de Boile`);
   log(`BoilerSim is verbonden`);
