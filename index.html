@@ -6,7 +6,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 </head>
 <body>
-  <img id="logo" src="itho_daalderop_logo.png" alt="Logo">
 
 
 
@@ -38,8 +37,8 @@
     <div id="boiler-frame">
       <div class="ntc-row">
         <label for="NTC6_select">NTC6: <input type="range" id="ntc6" min="92" max="128" value="92" oninput="updateNTCAndSlider('6', this.value)" /> <span id="ntc6-value">0°C</span> </label>
-        <select id="NTC6_select">
-          <option value="Connected">Connected</option>
+        <select id="NTC6_relais">
+          <option value="Connected1">Connected</option>
           <option value="Open Leads">Open Leads</option>
           <option value="Short Circuit">Short Circuit</option>
         </select>
@@ -105,6 +104,9 @@
           <option value="W00">W00</option>
           <option value="E10">E10</option>
           <option value="E11">E11</option>
+          <option value="Frost">Frost</option>
+          <option value="B3">B3</option>
+          <option value="B30">B30</option>
         </select>
         <button id="simulateError" onclick="simulateError()">Simulate Error</button>
         <button id="resetButton">Reset Button</button>

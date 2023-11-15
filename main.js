@@ -126,35 +126,46 @@ async function connect() {
 ////////////////////////////////simuleren dat boiler opwarmt///////////////////////////////////////////
 let runSimulation = false;
 
+let dataBuffer = ""; // Buiten de functie om de data tussen lezingen te behouden
+
 async function readData() {
-let reader = port.readable.getReader();
-let decoder = new TextDecoder('utf-8');
+    let reader = port.readable.getReader();
+    let decoder = new TextDecoder('utf-8');
 
-while (true) {
-  let { value, done } = await reader.read();
-  if (done) {
-      reader.releaseLock();
-      break;
-  }
+    while (true) {
+        let { value, done } = await reader.read();
+        if (done) {
+            reader.releaseLock();
+            break;
+        }
 
-  let data = decoder.decode(value);
-  let spiraal = document.getElementById('spiraal');
+        dataBuffer += decoder.decode(value); // Voeg de nieuwe data toe aan de buffer
 
-  if (data.includes('boiler staat aan') && currentBoilerStatus != 'aan') {
-    spiraal.style.backgroundColor = 'green';
-    currentBoilerStatus = 'aan';
-    log('boiler staat aan');
-    runSimulation = true;
-    startHeatUpSimulatie()
-  } else if (data.includes('boiler staat uit') && currentBoilerStatus != 'uit') {
-    spiraal.style.backgroundColor = 'red';
-    currentBoilerStatus = 'uit';
-    runSimulation = false;
-    log('boiler staat uit');
-  }
+        // Controleer of er een volledig bericht in de buffer zit
+        while (dataBuffer.includes('\n')) {
+            let newlineIndex = dataBuffer.indexOf('\n');
+            let message = dataBuffer.substring(0, newlineIndex).trim();
 
-  await new Promise(resolve => setTimeout(resolve, 1000));
-}
+            // Hier verwerken we het bericht
+            let spiraal = document.getElementById('spiraal');
+
+            if (message.includes('boiler staat aan') && currentBoilerStatus != 'aan') {
+                spiraal.style.backgroundColor = 'green';
+                currentBoilerStatus = 'aan';
+                log('boiler staat aan');
+                runSimulation = true;
+                startHeatUpSimulatie();
+            } else if (message.includes('boiler staat uit') && currentBoilerStatus != 'uit') {
+                spiraal.style.backgroundColor = 'red';
+                currentBoilerStatus = 'uit';
+                runSimulation = false;
+                log('boiler staat uit');
+            }
+
+            // Verwijder het verwerkte bericht uit de buffer
+            dataBuffer = dataBuffer.substring(newlineIndex + 1);
+        }
+    }
 }
 
 //hier kijk ik of hij op automatisch staat of niet
@@ -188,14 +199,14 @@ async function simulateHeatup() {
       let currentValue = Number(document.getElementById('ntc' + i).value);
       
       // Bereken de nieuwe waarde, maar zorg ervoor dat deze niet hoger is dan 255
-      let newValue = Math.min(currentValue + 5, 255);
+      let newValue = Math.min(currentValue + 3, 128);
 
       document.getElementById('ntc' + i).value = newValue;
       //log('Setting ntc ' + i + ' to ' + newValue / 2.55 + ' °C');  // Aangenomen dat 255 overeenkomt met 100°C
       await updatentc(i.toString(), newValue);
 
       // Wacht 100ms voordat je naar de volgende sensor gaat
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 300));
     }
     
     // Verlaat de lus als de waarde van elke sensor 255 is
@@ -361,9 +372,6 @@ async function updateNTC6(value) {
 
 // Voeg een event listener toe aan het dropdown-menu
 // Dit zal de geselecteerde waarde naar de Arduino sturen wanneer deze verandert
-document.getElementById("NTC6_select").onchange = function() { 
-  updateNTC6(this.value); 
-};
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -394,21 +402,6 @@ document.getElementById("link34").onchange = function() {
   }
 };
 
-async function togglentc(ntc, state) {
-  if (!port) {
-    console.log('Port is not connected');
-    return;
-  }
-
-// Verzend de gegevens naar de seriële poort
-  const writer = port.writable.getWriter();
-  const data = `TOGGLE${ntc}:${state ? 'ON' : 'OFF'}\n`;
-  await writer.write(new TextEncoder().encode(data));
-  writer.releaseLock();
-
-  // Update the ntc status
-  await updatentc(ntc, state ? 255 : 0);
-}
 
 // Voeg een "event listener" toe aan het element met id "ntc6". 
 //Wanneer de input wijzigt, wordt de functie updateNTCAndSlider uitgevoerd met '6' als het NTC-nummer en de huidige waarde van de input.
@@ -436,30 +429,22 @@ window.onload = function() {
   document.getElementById("ntc6-value").textContent = "20°C";
 
   log(`Welkom bij de Boile`);
-  log(`BoilerSim is verbonden`);
-
-}
-
+  log(`BoilerSim v0.1 is verbonden`);
+  log(`Wacht op log "boiler staat uit"`);
+  log(`Aanders pagina verversen`);
+};
 
 //realis toevoegen zie hieronder
-async function toggleRelay(state) {
-    if (!port) {
-      console.log('Port is not connected');
-      return;
-    }
-  
-    const writer = port.writable.getWriter();
-    const data = `TOGGLERELAY:${state ? 'ON' : 'OFF'}\n`;
-    await writer.write(new TextEncoder().encode(data));
-    writer.releaseLock();
-  
-    // Update the relay checkbox
-    document.getElementById('relay-toggle2').checked = state;
-  }
-  
 
 
 
+
+
+
+
+
+
+//////////////////////////////////////////invoer simulaties////////////////////////////////////////////
 async function simulateError() {
     let errorSelect = document.getElementById('errorSelect');
     let selectedError = errorSelect.options[errorSelect.selectedIndex].value;
@@ -551,27 +536,27 @@ async function simulateError() {
               log('Simulating error: ' + selectedError);
               log('Overheat protection');
               
-              document.getElementById('ntc1').value = 255;
+              document.getElementById('ntc1').value = 128;
               log('Setting ntc 1 to 100 °C');
               await updatentc('1', 255);
 
-              document.getElementById('ntc2').value = 255;
+              document.getElementById('ntc2').value = 128;
               log('Setting ntc 2 to 100 °C');
               await updatentc('2', 255);
 
-              document.getElementById('ntc3').value = 255;
+              document.getElementById('ntc3').value = 128;
               log('Setting ntc 3 to 100 °C');
               await updatentc('3', 255);
 
-              document.getElementById('ntc4').value = 255;
+              document.getElementById('ntc4').value = 128;
               log('Setting ntc 4 to 100 °C');
               await updatentc('4', 255);
 
-              document.getElementById('ntc5').value = 255;
+              document.getElementById('ntc5').value = 128;
               log('Setting ntc 5 to 100 °C');
               await updatentc('5', 255);
 
-              document.getElementById('ntc6').value = 255;
+              document.getElementById('ntc6').value = 128;
               log('Setting ntc 6 to 100 °C');
               await updatentc('6', 255);
 
@@ -582,17 +567,89 @@ async function simulateError() {
               log('Simulating error: ' + selectedError);
               log('Delta between the duplex sensor is too large');
               
-              document.getElementById('ntc3').value = 153;
+              document.getElementById('ntc3').value = 120;
               log('Setting ntc 3 to 60 °C');
-              await updatentc('3', 153);
+              await updatentc('3', 120);
 
-              document.getElementById('ntc4').value = 71;
+              document.getElementById('ntc4').value = 100;
               log('Setting ntc 4 to 30 °C');
-              await updatentc('4', 71);
+              await updatentc('4', 92);
 
               log('Done');
               break;
 
+            case 'Frost':
+              log('Simulating error: ' + selectedError);
+              log('Frost protection');
+                
+              document.getElementById('ntc1').value = 60;
+              log('Setting ntc 1 to 0 °C');
+              await updatentc('1', 60);
+  
+              document.getElementById('ntc2').value = 60;
+              log('Setting ntc 2 to 0 °C');
+              await updatentc('2', 60);
+  
+              document.getElementById('ntc3').value = 60;
+              log('Setting ntc 3 to 0 °C');
+              await updatentc('3', 60);
+  
+              document.getElementById('ntc4').value = 60;
+              log('Setting ntc 4 to 0 °C');
+              await updatentc('4', 60);
+  
+              document.getElementById('ntc5').value = 60;
+              log('Setting ntc 5 to 0 °C');
+              await updatentc('5', 60);
+  
+              document.getElementById('ntc6').value = 60;
+              log('Setting ntc 6 to 0 °C');
+              await updatentc('6', 60);
+  
+              log('Done');
+              break;
+
+            case 'B3':
+              log('Simulating error: ' + selectedError);
+              log('help, hot water vessel is boiling dry!');
+                  
+              document.getElementById('ntc1').value = 127;
+              log('Setting ntc 1 to max °C');
+              await updatentc('1', 127);
+    
+              document.getElementById('ntc2').value = 127;
+              log('Setting ntc 2 to max °C');
+              await updatentc('2', 127);
+    
+              document.getElementById('ntc3').value = 127;
+              log('Setting ntc 3 to max °C');
+              await updatentc('3', 127);
+    
+              document.getElementById('ntc4').value = 127;
+              log('Setting ntc 4 to max °C');
+              await updatentc('4', 127);
+    
+              document.getElementById('ntc5').value = 127;
+              log('Setting ntc 5 to max °C');
+              await updatentc('5', 127);
+    
+              document.getElementById('ntc6').value = 127;
+              log('Setting ntc 6 to max °C');
+              await updatentc('6', 127);
+    
+              log('Done');
+              break;
+
+            case 'B30':
+              log('Simulating error: ' + selectedError);
+              log('T UP 1 SHORTED');
+                    
+              document.getElementById('ntc4').value = 128;
+              log('Setting ntc 4 to open');
+              await updatentc('4', 128);
+      
+              log('Done');
+              break;
     }
     
 }
@@ -613,30 +670,30 @@ async function simulateError() {
 
   async function resetValues() {
     log('All settings reset');
-    document.getElementById("ntc1-value").textContent = "12°C";
-    document.getElementById("ntc1").value = 30;
+    document.getElementById("ntc1-value").textContent = "21°C";
+    document.getElementById("ntc1").value = 92;
     document.getElementById("ntc1").oninput = function() { updateNTCAndSlider('1', this.value); };
-    await updatentc('1', 30);
-    document.getElementById("ntc2-value").textContent = "12°C";
-    document.getElementById("ntc2").value = 30;
+    await updatentc('1', 92);
+    document.getElementById("ntc2-value").textContent = "21°C";
+    document.getElementById("ntc2").value = 92;
     document.getElementById("ntc2").oninput = function() { updateNTCAndSlider('2', this.value); };
-    await updatentc('2', 30);
-    document.getElementById("ntc3-value").textContent = "12°C";
-    document.getElementById("ntc3").value = 30;
+    await updatentc('2', 92);
+    document.getElementById("ntc3-value").textContent = "21°C";
+    document.getElementById("ntc3").value = 92;
     document.getElementById("ntc3").oninput = function() { updateNTCAndSlider('3', this.value); };
-    await updatentc('3', 30);
-    document.getElementById("ntc4-value").textContent = "12°C";
-    document.getElementById("ntc4").value = 30;
+    await updatentc('3', 92);
+    document.getElementById("ntc4-value").textContent = "21°C";
+    document.getElementById("ntc4").value = 92;
     document.getElementById("ntc4").oninput = function() { updateNTCAndSlider('4', this.value); };
-    await updatentc('4', 30);
-    document.getElementById("ntc5-value").textContent = "12°C";
-    document.getElementById("ntc5").value = 30;
+    await updatentc('4', 92);
+    document.getElementById("ntc5-value").textContent = "21°C";
+    document.getElementById("ntc5").value = 92;
     document.getElementById("ntc5").oninput = function() { updateNTCAndSlider('5', this.value); };
-    await updatentc('5', 30);
-    document.getElementById("ntc6-value").textContent = "12°C";
-    document.getElementById("ntc6").value = 30;
+    await updatentc('5', 92);
+    document.getElementById("ntc6-value").textContent = "21°C";
+    document.getElementById("ntc6").value = 92;
     document.getElementById("ntc6").oninput = function() { updateNTCAndSlider('6', this.value); };
-    await updatentc('6', 30);
+    await updatentc('6', 92);
 
     let ntc1Select = document.getElementById('NTC1_select');
     ntc1Select.value = "Connected";
